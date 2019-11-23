@@ -24,22 +24,34 @@ elemForm.onsubmit = e => {
   fetch(apiUrl)
     .then(response => {
       console.log("RESPONSE:", response);
-
       return response.json();
     })
-
     .then(data => {
       console.log(data);
-      let ol = document.createElement("ol");
-      console.log(data.Search);
-      let listFilm = data.Search;
-      for (let el in listFilm) {
-        let li = document.createElement("li");
-        for (let value in listFilm[el]) {
-          li.innerText += value + ": " + listFilm[el][value] + "; ";
+      if (data.Response == "False") {
+        let p = document.createElement("p");
+        p.innerText = "Movie not found!";
+        document.body.appendChild(p);
+      } else {
+        let ol = document.createElement("ol");
+        console.log(data.Search);
+        let listFilm = data.Search;
+        for (let el in listFilm) {
+          let li = document.createElement("li");
+          for (let value in listFilm[el]) {
+            li.innerText += value + ": " + listFilm[el][value] + "; ";
+          }
+          ol.appendChild(li);
         }
-        ol.appendChild(li);
+        document.body.appendChild(ol);
       }
-      document.body.appendChild(ol);
     });
 };
+let pagination_placeholder= document.getElementById("pagination_placeholder");
+$(function() {
+  $(pagination_placeholder).pagination({
+      items: 100,
+      itemsOnPage: 5,
+      cssStyle: 'light-theme'
+  });
+});

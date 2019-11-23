@@ -5,19 +5,27 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta http-equiv="X-UA-Compatible" content="ie=edge" />
     <title>Document</title>
+    <script
+      src="https://code.jquery.com/jquery-3.4.1.min.js"
+      integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo="
+      crossorigin="anonymous"
+    ></script>
+    <link type="text/css" rel="stylesheet" href="css/simplePagination.css" />
   </head>
   <body>
     <form id="elemForm">
       <p>введите название фильма</p>
-      <input type="text" name="s" id="titleFilm"/>
+      <input type="text" name="s" id="titleFilm" />
       <p>выберите тип фильма</p>
       <select name="type" id="typeFilm">
-      <option value="movie">movie</option>
-      <option value="series">series</option>
-      <option value="episode">episode</option>
-    </select>
-      <input type="submit"/>
+        <option value="movie">movie</option>
+        <option value="series">series</option>
+        <option value="episode">episode</option>
+      </select>
+      <input type="submit" />
     </form>
+    <div id="pagination_placeholder"></div>
     <script src="js/ajax.js"></script>
+    <script type="text/javascript" src="js/jquery.simplePagination.js"></script>
   </body>
 </html>
