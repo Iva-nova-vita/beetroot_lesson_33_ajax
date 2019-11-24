@@ -18,22 +18,18 @@ OMDB (http://www.omdbapi.com/) с помощью AJAX.
 let elemForm = document.getElementById("elemForm");
 let page_link = document.getElementsByClassName("page-link");
 let current = document.getElementsByClassName("current");
-
-document.body.addEventListener('click', setNumPage);
-elemForm.onsubmit = (e)=> {
+document.body.addEventListener("click", setNumPage);
+elemForm.onsubmit = e => {
   e.preventDefault();
   let titleFilm = document.getElementById("titleFilm").value;
   let typeFilm = document.getElementById("typeFilm").value;
   let listFilmPlaceholder = document.getElementById("listFilmPlaceholder");
+  listFilmPlaceholder.innerHTML = "";
   let pagination_placeholder = document.getElementById(
     "pagination_placeholder"
   );
-
-
   let page = 1;
-  //let page = document.getElementsByClassName("current").innerText;
   let apiUrl = `http://www.omdbapi.com/?s=${titleFilm}&type=${typeFilm}&page=${page}&apikey=a6848e81&`;
-
   fetch(apiUrl)
     .then(response => {
       console.log("RESPONSE:", response);
@@ -44,7 +40,7 @@ elemForm.onsubmit = (e)=> {
       if (data.Response == "False") {
         let p = document.createElement("p");
         p.innerText = "Movie not found!";
-        document.body.appendChild(p);
+        listFilmPlaceholder.appendChild(p);
       } else {
         let ol = document.createElement("ol");
         console.log(data.Search);
@@ -58,26 +54,52 @@ elemForm.onsubmit = (e)=> {
         }
         listFilmPlaceholder.appendChild(ol);
         //console.log(listFilm);
-        //return listFilm;  как можно вывести список фильмов?
-
+        //return listFilm;                               как можно вывести список фильмов?
         $(function() {
           $(pagination_placeholder).pagination({
             items: data.totalResults,
             itemsOnPage: listFilm.length,
-            cssStyle: "light-theme",
-            //onPageClick: 
+            cssStyle: "light-theme"
+            //onPageClick:  onPageClick                  не получилось настроить
           });
         });
       }
     });
-     
 };
 function setNumPage(e) {
-  if (e.target.tagName!="A") return;
+  if (e.target.tagName != "A") return;
   page = current[0].innerText;
-console.log(page);
-
-
+  console.log(page);
+  onPageClick();
+}
+function onPageClick() {
+  let titleFilm = document.getElementById("titleFilm").value;
+  let typeFilm = document.getElementById("typeFilm").value;
+  let listFilmPlaceholder = document.getElementById("listFilmPlaceholder");
+  listFilmPlaceholder.innerHTML = "";
+  let apiUrl = `http://www.omdbapi.com/?s=${titleFilm}&type=${typeFilm}&page=${page}&apikey=a6848e81&`;
+  fetch(apiUrl)
+    .then(response => {
+      console.log("RESPONSE:", response);
+      return response.json();
+    })
+    .then(data => {
+      console.log(data);
+      let ol = document.createElement("ol");
+      console.log(data.Search);
+      let listFilm = data.Search;
+      for (let el in listFilm) {
+        console.log(el);
+        let li = document.createElement("li");
+        let liNum = (page - 1) * 10 + parseInt(el) + 1;
+        li.setAttribute("value", `${liNum}`);
+        for (let value in listFilm[el]) {
+          li.innerText += value + ": " + listFilm[el][value] + "; ";
+        }
+        ol.appendChild(li);
+      }
+      listFilmPlaceholder.appendChild(ol);
+    });
 }
 
 
