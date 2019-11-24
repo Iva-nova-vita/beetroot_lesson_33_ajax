@@ -16,11 +16,24 @@ OMDB (http://www.omdbapi.com/) с помощью AJAX.
 Все запросы необходимо отправлять, используя AJAX. То есть при нажатии на любые кнопки ваша веб-страница не должна обновляться.
 Ссылка на API OMDB: http://www.omdbapi.com/ (необходимо зарегистри роваться для получения API KEY).*/
 let elemForm = document.getElementById("elemForm");
-elemForm.onsubmit = e => {
+let page_link = document.getElementsByClassName("page-link");
+let current = document.getElementsByClassName("current");
+
+document.body.addEventListener('click', setNumPage);
+elemForm.onsubmit = (e)=> {
   e.preventDefault();
   let titleFilm = document.getElementById("titleFilm").value;
   let typeFilm = document.getElementById("typeFilm").value;
-  let apiUrl = `http://www.omdbapi.com/?s=${titleFilm}&type=${typeFilm}&apikey=a6848e81&`;
+  let listFilmPlaceholder = document.getElementById("listFilmPlaceholder");
+  let pagination_placeholder = document.getElementById(
+    "pagination_placeholder"
+  );
+
+
+  let page = 1;
+  //let page = document.getElementsByClassName("current").innerText;
+  let apiUrl = `http://www.omdbapi.com/?s=${titleFilm}&type=${typeFilm}&page=${page}&apikey=a6848e81&`;
+
   fetch(apiUrl)
     .then(response => {
       console.log("RESPONSE:", response);
@@ -43,15 +56,29 @@ elemForm.onsubmit = e => {
           }
           ol.appendChild(li);
         }
-        document.body.appendChild(ol);
+        listFilmPlaceholder.appendChild(ol);
+        //console.log(listFilm);
+        //return listFilm;  как можно вывести список фильмов?
+
+        $(function() {
+          $(pagination_placeholder).pagination({
+            items: data.totalResults,
+            itemsOnPage: listFilm.length,
+            cssStyle: "light-theme",
+            //onPageClick: 
+          });
+        });
       }
     });
+     
 };
-let pagination_placeholder= document.getElementById("pagination_placeholder");
-$(function() {
-  $(pagination_placeholder).pagination({
-      items: 100,
-      itemsOnPage: 5,
-      cssStyle: 'light-theme'
-  });
-});
+function setNumPage(e) {
+  if (e.target.tagName!="A") return;
+  page = current[0].innerText;
+console.log(page);
+
+
+}
+
+
+
