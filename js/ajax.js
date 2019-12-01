@@ -50,13 +50,19 @@ elemForm.onsubmit = e => {
           for (let value in listFilm[el]) {
             li.innerText += value + ": " + listFilm[el][value] + "; ";
           }
-          li.onmouseenter=addToFav;
-          function addToFav() {
-            let fav= document.createElement("button");
-            fav.innerText="add to favorite"
-            li.appendChild(fav);
+          li.onmouseenter=addToFavourites;
+          function addToFavourites() {
+            let btnAddToFav= document.createElement("button");
+            btnAddToFav.innerText="add to favorite"
+            li.appendChild(btnAddToFav);
+            btnAddToFav.onclick = ()=>{
+              document.createElement
+              let myStorage=window.localStorage;
+              myStorage.setItem("id", `${listFilm[el].imdbID}`);
+              console.log(myStorage);
+            }
             li.onmouseleave = ()=> {
-              fav.remove();
+              btnAddToFav.remove();
             }
           } 
           ol.appendChild(li);
