@@ -50,6 +50,15 @@ elemForm.onsubmit = e => {
           for (let value in listFilm[el]) {
             li.innerText += value + ": " + listFilm[el][value] + "; ";
           }
+          li.onmouseenter=addToFav;
+          function addToFav() {
+            let fav= document.createElement("button");
+            fav.innerText="add to favorite"
+            li.appendChild(fav);
+            li.onmouseleave = ()=> {
+              fav.remove();
+            }
+          } 
           ol.appendChild(li);
         }
         listFilmPlaceholder.appendChild(ol);
@@ -66,6 +75,7 @@ elemForm.onsubmit = e => {
       }
     });
 };
+
 function setNumPage(e) {
   if (e.target.tagName != "A") return;
   page = current[0].innerText;
@@ -96,11 +106,21 @@ function onPageClick() {
         for (let value in listFilm[el]) {
           li.innerText += value + ": " + listFilm[el][value] + "; ";
         }
+        li.onmouseenter=addToFav;
+          function addToFav() {
+            let fav= document.createElement("button");
+            fav.innerText="add to favorite"
+            li.appendChild(fav);
+            li.onmouseleave = ()=> {
+              fav.remove();
+            }
+          } 
         ol.appendChild(li);
       }
       listFilmPlaceholder.appendChild(ol);
     });
 }
 
-
-
+//Для домашнего задания по теме AJAX реализовать функционал страницы favorite movies,
+//используя для хранения избранных фильмов localStorage. В хранилище лучше
+//записывать не фильм целиком, а только его id.
