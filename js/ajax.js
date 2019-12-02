@@ -18,6 +18,9 @@ OMDB (http://www.omdbapi.com/) с помощью AJAX.
 let elemForm = document.getElementById("elemForm");
 let page_link = document.getElementsByClassName("page-link");
 let current = document.getElementsByClassName("current");
+let btnShowFav = document.createElement("button");
+btnShowFav.innerText = "show selected films";
+document.body.appendChild(btnShowFav);
 document.body.addEventListener("click", setNumPage);
 elemForm.onsubmit = e => {
   e.preventDefault();
@@ -50,32 +53,43 @@ elemForm.onsubmit = e => {
           for (let value in listFilm[el]) {
             li.innerText += value + ": " + listFilm[el][value] + "; ";
           }
-          li.onmouseenter=addToFavourites;
+          li.onmouseenter = addToFavourites;
           function addToFavourites() {
-            let btnAddToFav= document.createElement("button");
-            btnAddToFav.innerText="add to favorite"
+            let btnAddToFav = document.createElement("button");
+            btnAddToFav.innerText = "add to favorite";
             li.appendChild(btnAddToFav);
-            btnAddToFav.onclick = ()=>{
-              document.createElement
-              let myStorage=window.localStorage;
-              myStorage.setItem("id", `${listFilm[el].imdbID}`);
-              console.log(myStorage);
-            }
-            li.onmouseleave = ()=> {
+            li.onmouseleave = () => {
               btnAddToFav.remove();
-            }
-          } 
+            };
+
+            /**
+             * localStorage creation
+             */
+            let id = []; //в массив сохраняется только посл элемент
+            let favFilmsList = {
+              storage: null,
+              setId(id) {
+                this.storage.setItem("id", JSON.stringify(id));
+              },
+              getId() {
+                return JSON.parse(this.storage.getItem("id"));
+              }
+            };
+            favFilmsList.storage = window.localStorage;
+            btnAddToFav.onclick = () => {
+              id.push({ id: `${listFilm[el].imdbID}` });
+              console.log(id);
+              favFilmsList.setId(id);
+            };
+          }
           ol.appendChild(li);
         }
         listFilmPlaceholder.appendChild(ol);
-        //console.log(listFilm);
-        //return listFilm;                               как можно вывести список фильмов?
         $(function() {
           $(pagination_placeholder).pagination({
             items: data.totalResults,
             itemsOnPage: listFilm.length,
             cssStyle: "light-theme"
-            //onPageClick:  onPageClick                  не получилось настроить
           });
         });
       }
@@ -112,15 +126,15 @@ function onPageClick() {
         for (let value in listFilm[el]) {
           li.innerText += value + ": " + listFilm[el][value] + "; ";
         }
-        li.onmouseenter=addToFav;
-          function addToFav() {
-            let fav= document.createElement("button");
-            fav.innerText="add to favorite"
-            li.appendChild(fav);
-            li.onmouseleave = ()=> {
-              fav.remove();
-            }
-          } 
+        li.onmouseenter = addToFav;
+        function addToFav() {
+          let fav = document.createElement("button");
+          fav.innerText = "add to favorite";
+          li.appendChild(fav);
+          li.onmouseleave = () => {
+            fav.remove();
+          };
+        }
         ol.appendChild(li);
       }
       listFilmPlaceholder.appendChild(ol);
@@ -130,3 +144,4 @@ function onPageClick() {
 //Для домашнего задания по теме AJAX реализовать функционал страницы favorite movies,
 //используя для хранения избранных фильмов localStorage. В хранилище лучше
 //записывать не фильм целиком, а только его id.
+
