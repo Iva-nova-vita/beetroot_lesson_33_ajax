@@ -19,6 +19,7 @@ let elemForm = document.getElementById("elemForm");
 let page_link = document.getElementsByClassName("page-link");
 let current = document.getElementsByClassName("current");
 let btnShowFav = document.createElement("button");
+let id = [];
 btnShowFav.innerText = "show selected films";
 document.body.appendChild(btnShowFav);
 document.body.addEventListener("click", setNumPage);
@@ -53,19 +54,21 @@ elemForm.onsubmit = e => {
           for (let value in listFilm[el]) {
             li.innerText += value + ": " + listFilm[el][value] + "; ";
           }
+          /** 
+           * button "add to favourites" create/remove
+           */
           li.onmouseenter = addToFavourites;
           function addToFavourites() {
+            
             let btnAddToFav = document.createElement("button");
             btnAddToFav.innerText = "add to favorite";
             li.appendChild(btnAddToFav);
             li.onmouseleave = () => {
               btnAddToFav.remove();
-            };
-
+            }
             /**
              * localStorage creation
              */
-            let id = []; //в массив сохраняется только посл элемент
             let favFilmsList = {
               storage: null,
               setId(id) {
@@ -77,10 +80,19 @@ elemForm.onsubmit = e => {
             };
             favFilmsList.storage = window.localStorage;
             btnAddToFav.onclick = () => {
-              id.push({ id: `${listFilm[el].imdbID}` });
+              
+              if (id.includes(listFilm[el].imdbID)) return;
+               else {
+              id.push(`${listFilm[el].imdbID}`);
               console.log(id);
               favFilmsList.setId(id);
+              };
             };
+            /*btnShowFav.onclick = ()=> {
+              document.createElement("ol");
+              for ()
+
+            }*/
           }
           ol.appendChild(li);
         }
