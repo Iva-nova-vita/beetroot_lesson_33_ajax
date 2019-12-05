@@ -19,19 +19,34 @@ let elemForm = document.getElementById("elemForm");
 let page_link = document.getElementsByClassName("page-link");
 let current = document.getElementsByClassName("current");
 let btnShowFav = document.createElement("button");
-let id = [];
+let listFilmPlaceholder = document.getElementById("listFilmPlaceholder");
+let pagination_placeholder = document.getElementById("pagination_placeholder");
 btnShowFav.innerText = "show selected films";
 document.body.appendChild(btnShowFav);
+
+let btnAddToFav;
+let btnRemFromFav;
 document.body.addEventListener("click", setNumPage);
+/**
+ * localStorage creation
+ */
+let id = [];
+let favFilmsList = {
+  storage: null,
+  setId(id) {
+    this.storage.setItem("id", JSON.stringify(id));
+  },
+  getId() {
+    return JSON.parse(this.storage.getItem("id"));
+  }
+};
+favFilmsList.storage = window.localStorage;
+
 elemForm.onsubmit = e => {
   e.preventDefault();
   let titleFilm = document.getElementById("titleFilm").value;
   let typeFilm = document.getElementById("typeFilm").value;
-  let listFilmPlaceholder = document.getElementById("listFilmPlaceholder");
   listFilmPlaceholder.innerHTML = "";
-  let pagination_placeholder = document.getElementById(
-    "pagination_placeholder"
-  );
   let page = 1;
   let apiUrl = `http://www.omdbapi.com/?s=${titleFilm}&type=${typeFilm}&page=${page}&apikey=a6848e81&`;
   fetch(apiUrl)
@@ -48,55 +63,69 @@ elemForm.onsubmit = e => {
       } else {
         let ol = document.createElement("ol");
         console.log(data.Search);
-        let listFilm = data.Search;
+        listFilm = data.Search;
         for (let el in listFilm) {
           let li = document.createElement("li");
           for (let value in listFilm[el]) {
             li.innerText += value + ": " + listFilm[el][value] + "; ";
           }
-          /** 
-           * button "add to favourites" create/remove
+          ol.appendChild(li);
+          /**
+           * creation button "add to favourites"/add to local storage
            */
           li.onmouseenter = addToFavourites;
           function addToFavourites() {
-            
-            let btnAddToFav = document.createElement("button");
+            if (id.includes(listFilm[el].imdbID) === true) {
+              RemFromFav();
+              return;
+            }
+            btnAddToFav = document.createElement("button");
             btnAddToFav.innerText = "add to favorite";
             li.appendChild(btnAddToFav);
             li.onmouseleave = () => {
-              btnAddToFav.remove();
-            }
-            /**
-             * localStorage creation
-             */
-            let favFilmsList = {
-              storage: null,
-              setId(id) {
-                this.storage.setItem("id", JSON.stringify(id));
-              },
-              getId() {
-                return JSON.parse(this.storage.getItem("id"));
-              }
+              btnAddToFav.style.display = "none";
             };
-            favFilmsList.storage = window.localStorage;
+
             btnAddToFav.onclick = () => {
-              
-              if (id.includes(listFilm[el].imdbID)) return;
-               else {
               id.push(`${listFilm[el].imdbID}`);
               console.log(id);
               favFilmsList.setId(id);
+              btnAddToFav.style.display = "none";
+              li.onmouseleave = () => {
+                btnRemFromFav.style.display = "none";
+              };
+              RemFromFav();
+            };
+          }
+          /**
+           * creation button "remove from favorite"/delete from local storage
+           */
+          function RemFromFav() {
+            btnRemFromFav = document.createElement("button");
+            btnRemFromFav.innerText = "remove from favorite";
+            li.appendChild(btnRemFromFav);
+            li.onmouseleave = () => {
+              btnRemFromFav.style.display = "none";
+            };
+
+            btnRemFromFav.onclick = () => {
+              let index = id.indexOf(`${listFilm[el].imdbID}`);
+              id.splice(index, 1);
+              console.log(id);
+              favFilmsList.setId(id);
+              btnRemFromFav.style.display = "none";
+              addToFavourites();
+              li.onmouseleave = () => {
+                btnAddToFav.style.display = "none";
               };
             };
-            /*btnShowFav.onclick = ()=> {
-              document.createElement("ol");
-              for ()
-
-            }*/
           }
-          ol.appendChild(li);
         }
         listFilmPlaceholder.appendChild(ol);
+        /** 
+         * pagination creation
+         */
+
         $(function() {
           $(pagination_placeholder).pagination({
             items: data.totalResults,
@@ -156,4 +185,3 @@ function onPageClick() {
 //Для домашнего задания по теме AJAX реализовать функционал страницы favorite movies,
 //используя для хранения избранных фильмов localStorage. В хранилище лучше
 //записывать не фильм целиком, а только его id.
-
