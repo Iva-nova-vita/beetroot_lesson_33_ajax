@@ -18,17 +18,23 @@ OMDB (http://www.omdbapi.com/) с помощью AJAX.
 let elemForm = document.getElementById("elemForm");
 let page_link = document.getElementsByClassName("page-link");
 let current = document.getElementsByClassName("current");
-let btnShowFav = document.createElement("button");
 let listFilmPlaceholder = document.getElementById("listFilmPlaceholder");
 let pagination_placeholder = document.getElementById("pagination_placeholder");
+let btnShowFav = document.createElement("button");
 btnShowFav.innerText = "show selected films";
 document.body.appendChild(btnShowFav);
-
 let btnAddToFav;
 let btnRemFromFav;
+let page = 1;
 document.body.addEventListener("click", setNumPage);
+function setNumPage(e) {
+  if (e.target.tagName != "A") return;
+  page = current[0].innerText;
+  console.log(page);
+  sendRequest();
+}
 /**
- * localStorage creation
+ * localStorage (favorite films)
  */
 let id = [];
 let favFilmsList = {
@@ -41,17 +47,20 @@ let favFilmsList = {
   }
 };
 favFilmsList.storage = window.localStorage;
-
+/** 
+ * sending request and getting list films
+ */
 elemForm.onsubmit = e => {
   e.preventDefault();
+  sendRequest();
+};
+function sendRequest() {
+  listFilmPlaceholder.innerHTML = "";
   let titleFilm = document.getElementById("titleFilm").value;
   let typeFilm = document.getElementById("typeFilm").value;
-  listFilmPlaceholder.innerHTML = "";
-  let page = 1;
   let apiUrl = `http://www.omdbapi.com/?s=${titleFilm}&type=${typeFilm}&page=${page}&apikey=a6848e81&`;
   fetch(apiUrl)
     .then(response => {
-      console.log("RESPONSE:", response);
       return response.json();
     })
     .then(data => {
@@ -66,6 +75,8 @@ elemForm.onsubmit = e => {
         listFilm = data.Search;
         for (let el in listFilm) {
           let li = document.createElement("li");
+          let liNum = (page - 1) * 10 + parseInt(el) + 1;
+          li.setAttribute("value", `${liNum}`);
           for (let value in listFilm[el]) {
             li.innerText += value + ": " + listFilm[el][value] + "; ";
           }
@@ -122,10 +133,10 @@ elemForm.onsubmit = e => {
           }
         }
         listFilmPlaceholder.appendChild(ol);
-        /** 
+        /**
          * pagination creation
          */
-
+        if (page !== 1) return;
         $(function() {
           $(pagination_placeholder).pagination({
             items: data.totalResults,
@@ -135,53 +146,9 @@ elemForm.onsubmit = e => {
         });
       }
     });
-};
-
-function setNumPage(e) {
-  if (e.target.tagName != "A") return;
-  page = current[0].innerText;
-  console.log(page);
-  onPageClick();
-}
-function onPageClick() {
-  let titleFilm = document.getElementById("titleFilm").value;
-  let typeFilm = document.getElementById("typeFilm").value;
-  let listFilmPlaceholder = document.getElementById("listFilmPlaceholder");
-  listFilmPlaceholder.innerHTML = "";
-  let apiUrl = `http://www.omdbapi.com/?s=${titleFilm}&type=${typeFilm}&page=${page}&apikey=a6848e81&`;
-  fetch(apiUrl)
-    .then(response => {
-      console.log("RESPONSE:", response);
-      return response.json();
-    })
-    .then(data => {
-      console.log(data);
-      let ol = document.createElement("ol");
-      console.log(data.Search);
-      let listFilm = data.Search;
-      for (let el in listFilm) {
-        console.log(el);
-        let li = document.createElement("li");
-        let liNum = (page - 1) * 10 + parseInt(el) + 1;
-        li.setAttribute("value", `${liNum}`);
-        for (let value in listFilm[el]) {
-          li.innerText += value + ": " + listFilm[el][value] + "; ";
-        }
-        li.onmouseenter = addToFav;
-        function addToFav() {
-          let fav = document.createElement("button");
-          fav.innerText = "add to favorite";
-          li.appendChild(fav);
-          li.onmouseleave = () => {
-            fav.remove();
-          };
-        }
-        ol.appendChild(li);
-      }
-      listFilmPlaceholder.appendChild(ol);
-    });
 }
 
 //Для домашнего задания по теме AJAX реализовать функционал страницы favorite movies,
 //используя для хранения избранных фильмов localStorage. В хранилище лучше
 //записывать не фильм целиком, а только его id.
+
