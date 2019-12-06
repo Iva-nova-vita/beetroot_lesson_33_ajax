@@ -20,9 +20,6 @@ let page_link = document.getElementsByClassName("page-link");
 let current = document.getElementsByClassName("current");
 let listFilmPlaceholder = document.getElementById("listFilmPlaceholder");
 let pagination_placeholder = document.getElementById("pagination_placeholder");
-let btnShowFav = document.createElement("button");
-btnShowFav.innerText = "show selected films";
-document.body.appendChild(btnShowFav);
 let btnAddToFav;
 let btnRemFromFav;
 let page = 1;
@@ -34,20 +31,6 @@ function setNumPage(e) {
   sendRequest();
 }
 /**
- * localStorage (favorite films)
- */
-let id = [];
-let favFilmsList = {
-  storage: null,
-  setId(id) {
-    this.storage.setItem("id", JSON.stringify(id));
-  },
-  getId() {
-    return JSON.parse(this.storage.getItem("id"));
-  }
-};
-favFilmsList.storage = window.localStorage;
-/** 
  * sending request and getting list films
  */
 elemForm.onsubmit = e => {
@@ -91,6 +74,7 @@ function sendRequest() {
               return;
             }
             btnAddToFav = document.createElement("button");
+            btnAddToFav.style.display = "block";
             btnAddToFav.innerText = "add to favorite";
             li.appendChild(btnAddToFav);
             li.onmouseleave = () => {
@@ -98,6 +82,7 @@ function sendRequest() {
             };
 
             btnAddToFav.onclick = () => {
+              listFavFilmPlaceholder.innerHTML = "";
               id.push(`${listFilm[el].imdbID}`);
               console.log(id);
               favFilmsList.setId(id);
@@ -113,6 +98,7 @@ function sendRequest() {
            */
           function RemFromFav() {
             btnRemFromFav = document.createElement("button");
+            btnRemFromFav.style.display = "block";
             btnRemFromFav.innerText = "remove from favorite";
             li.appendChild(btnRemFromFav);
             li.onmouseleave = () => {
@@ -151,4 +137,51 @@ function sendRequest() {
 //Для домашнего задания по теме AJAX реализовать функционал страницы favorite movies,
 //используя для хранения избранных фильмов localStorage. В хранилище лучше
 //записывать не фильм целиком, а только его id.
+
+/**
+ * localStorage (favorite films)
+ */
+let id = [];
+let favFilmsList = {
+  storage: null,
+  setId(id) {
+    this.storage.setItem("id", JSON.stringify(id));
+  },
+  getId() {
+    return JSON.parse(this.storage.getItem("id"));
+  }
+};
+favFilmsList.storage = window.localStorage;
+/**
+ * show selected films
+ */
+let listFavFilmPlaceholder = document.getElementById("listFavFilmPlaceholder");
+let btnShowFav = document.createElement("button");
+btnShowFav.innerText = "show selected films";
+document.body.appendChild(btnShowFav);
+btnShowFav.onclick = () => {
+  listFavFilmPlaceholder.innerHTML = "";
+  if (id.length < 1) {
+    let p = document.createElement("p");
+    p.innerText = "You have not favorite movies!";
+    listFavFilmPlaceholder.appendChild(p);
+  } else {
+    let ol = document.createElement("ol");
+    for (let el of id) {
+      let i = el;
+      let apiUrl = `http://www.omdbapi.com/?i=${i}&apikey=a6848e81&`;
+      fetch(apiUrl)
+        .then(response => {
+          return response.json();
+        })
+        .then(data => {
+          listFavFilm = data;
+          let li = document.createElement("li");
+          li.innerText = listFavFilm.Title + ", " + listFavFilm.Year + "; ";
+          ol.appendChild(li);
+          listFavFilmPlaceholder.appendChild(ol);
+        });
+    }
+  }
+};
 
