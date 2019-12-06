@@ -52,6 +52,7 @@ function sendRequest() {
         let p = document.createElement("p");
         p.innerText = "Movie not found!";
         listFilmPlaceholder.appendChild(p);
+        return;
       } else {
         let ol = document.createElement("ol");
         console.log(data.Search);
@@ -184,4 +185,5 @@ btnShowFav.onclick = () => {
     }
   }
 };
+
 
